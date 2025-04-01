@@ -6,8 +6,6 @@ import Link from "next/link";
 
 const TeacherPage = async () => {
   const { userId } = auth();
-
-  // Fetch the teacher's information using the userId
   if (!userId) {
     return <div>User ID is not available</div>;
   }
@@ -46,7 +44,7 @@ const TeacherPage = async () => {
             <div className="w-1/3">
               <div className="relative w-36 h-36 rounded-full overflow-hidden border-4 border-gray-100 shadow-sm">
                 <Image
-                  src={teacher.img || "/noAvatar.png"}
+                  src={ "/noAvatar.png"}
                   alt={`${teacher.name} profile`}
                   width={144}
                   height={144}

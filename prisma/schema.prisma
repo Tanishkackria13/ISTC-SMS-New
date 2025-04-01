@@ -25,6 +25,7 @@ model Student {
   phone        String
   email        String?
   sex          UserSex?
+  category     String?
   bloodType    String?
   createdAt    DateTime      @default(now())
   branchId     Int
@@ -177,10 +178,8 @@ model Result {
   endTerm       Int?
   overallMark   Int
   grade         String
-
   studentId String
   student   Student @relation(fields: [studentId], references: [id], map: "Result_studentId_fk")
-
   subjectId Int?
   subject   Subject? @relation(fields: [subjectId], references: [id], map: "Result_subjectId_fk")
 

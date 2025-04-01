@@ -1,20 +1,8 @@
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 const Navbar = async () => {
   const user = await currentUser();
-
-  {/*handling the announcemnet icon giving server error will see later !!!!!*/}
-
-  // const router = useRouter(); // Initialize useRouter
-
-  // // Handler for the announcement image click
-  // const handleAnnouncementClick = () => {
-  //   router.push("/list/announcements"); // Navigate to the announcements page
-  // };
-
 
   return (
     <div className="flex items-center justify-between p-4">

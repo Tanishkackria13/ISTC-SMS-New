@@ -100,10 +100,10 @@ const TheoryInchargeListPage = async ({
         <div className="mb-4 md:mb-0">
           <h1 className="text-xl font-semibold text-gray-800 flex items-center">
             <span className="bg-red-500 w-2 h-6 rounded mr-2 hidden md:block"></span>
-            All Teacher Incharges
+            All Theory Incharge
           </h1>
           <p className="text-sm text-red-500 mt-1 hidden md:block">
-            View and manage Teacher Incharge accounts
+            View and manage theory incharge accounts
           </p>
         </div>
         

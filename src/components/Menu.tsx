@@ -34,7 +34,7 @@ const menuItems = [
         icon: "/registrar.png",
         label: "Teacher Incharges",
         href: "/list/theoryIncharges",
-        visible: ["admin","registrar"],
+        visible: ["admin"],
       },
       {
         icon: "/subject.png",

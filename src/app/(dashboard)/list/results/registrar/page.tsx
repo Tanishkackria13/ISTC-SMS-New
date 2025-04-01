@@ -101,7 +101,7 @@ export default function RegistrarResultsPage() {
     <div className="p-6">
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold mb-4">Uploaded Results</h1>
-        <Link href={"/list/results/teacher"}>
+        <Link href={"/list/results/allteachers"}>
           <h1 className="text-xl font-semibold mb-8 mr-20 p-4 border rounded bg-yellow-200">Check the Result List</h1>
         </Link>
       </div>

@@ -4,7 +4,6 @@ import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
 import prisma from "@/lib/prisma";
 import { Prisma, Subject, Teacher, Semester, Branch } from "@prisma/client";
-import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
 import { SubjectFilters } from "@/components/Filter";
 
@@ -38,7 +37,6 @@ const SubjectListPage = async ({
       accessor: "action",
     },
   ];
-
   const renderRow = (item: SubjectList) => (
     <tr
       key={item.id}
@@ -56,16 +54,21 @@ const SubjectListPage = async ({
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
-            View Curriculum
+          View Curriculum
           </a>
         )}
       </td>
       <td>
         <div className="flex items-center gap-2">
+          
+          {(role === "admin" || role === "theoryIncharge") && (
+            <>
+            <FormContainer table="subject" type="update" data={item} branchId={item.branchId} />
+            </>
+          )}
           {(role === "admin" || role === "registrar" || role === "theoryIncharge") && (
             <>
-              <FormContainer table="subject" type="update" data={item} branchId={item.branchId} />
-              <FormContainer table="subject" type="delete" id={item.id} />
+            <FormContainer table="subject" type="delete" id={item.id} />
             </>
           )}
         </div>
@@ -80,16 +83,13 @@ const SubjectListPage = async ({
 
   // Query logic
   const query: Prisma.SubjectWhereInput = {};
-
-  // Search functionality
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {
       if (value !== undefined) {
         switch (key) {
           case "search":
-            // Case-insensitive search without `mode`
             query.name = {
-              contains: value.toLowerCase(), // Convert search term to lowercase
+              contains: value.toLowerCase(), 
             };
             break;
           default:
@@ -98,13 +98,9 @@ const SubjectListPage = async ({
       }
     }
   }
-
-  // Filter by branch
   if (branchId) {
-    query.branchId = parseInt(branchId); // Parse branchId as an integer
+    query.branchId = parseInt(branchId); 
   }
-
-  // Filter by semester
   if (semester) {
     query.semesterId = parseInt(semester); // Parse semester as an integer
   }

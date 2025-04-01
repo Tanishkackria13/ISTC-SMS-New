@@ -4,21 +4,17 @@ import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import type { Result, Student, Subject, Branch, Prisma, Teacher } from "@prisma/client";
-import StudentResultDownload from "@/components/StudentResultDownload";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import type { Result, Student, Subject, Branch, Teacher } from "@prisma/client";
 import { ResultFilters } from "@/components/Filter";
+import { currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
 
 type ResultList = Result & { student: Student; subject: Subject; branch: Branch; teacher: Teacher };
 
-const ResultListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
-  // Get authenticated user
+const AllResultListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
   const user = await currentUser();
-  const teacherId = user?.id; // Directly using Clerk's user ID as teacherId
+  const teacherId = user?.id;
   const role = user?.publicMetadata?.role as string | undefined;
-
-  console.log("User ID (Teacher ID):", teacherId);
-  console.log("User Role:", role);
 
   const columns = [
     { header: "Student Name", accessor: "student.name", className: "hidden md:table-cell" },
@@ -49,23 +45,16 @@ const ResultListPage = async ({ searchParams }: { searchParams: { [key: string]:
   const p = page ? Number.parseInt(page) : 1;
 
   const query: Prisma.ResultWhereInput = {};
-
-  // Handle search by student name
   if (queryParams.studentName) {
     query.student = { name: { contains: queryParams.studentName, mode: "insensitive" } };
   }
-
-  // Handle branch filter
   if (branchId) {
     query.student = { ...query.student, branchId: Number.parseInt(branchId) };
   }
-
-  // Handle semester filter
   if (semester) {
     query.student = { ...query.student, semesterId: Number.parseInt(semester) };
   }
 
-  // Fetch allotted subjects for the teacher
   let allowedSubjectIds: number[] = [];
 
   if (role === "teacher" && teacherId) {
@@ -76,9 +65,7 @@ const ResultListPage = async ({ searchParams }: { searchParams: { [key: string]:
       });
 
       allowedSubjectIds = teacherSubjects.map((subject) => subject.id);
-      console.log("Allowed Subject IDs:", allowedSubjectIds);
 
-      // If no subjects are allotted, show no results
       if (allowedSubjectIds.length === 0) {
         return (
           <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
@@ -88,12 +75,11 @@ const ResultListPage = async ({ searchParams }: { searchParams: { [key: string]:
         );
       }
 
-      // Apply subject filter based on allotted subjects
       if (subjectId) {
         const requestedSubjectId = Number.parseInt(subjectId);
         query.subjectId = allowedSubjectIds.includes(requestedSubjectId)
           ? requestedSubjectId
-          : { in: [] }; // Ensures unauthorized subjects are not shown
+          : { in: [] };
       } else {
         query.subjectId = { in: allowedSubjectIds };
       }
@@ -101,13 +87,9 @@ const ResultListPage = async ({ searchParams }: { searchParams: { [key: string]:
       console.error("Error fetching teacher subjects:", error);
     }
   } else if (subjectId) {
-    // For non-teacher roles, apply the subject filter directly
     query.subjectId = Number.parseInt(subjectId);
   }
 
-  console.log("Final Query:", JSON.stringify(query, null, 2));
-
-  // Fetch results based on the query
   try {
     const [dataRes, count] = await prisma.$transaction([
       prisma.result.findMany({
@@ -128,16 +110,9 @@ const ResultListPage = async ({ searchParams }: { searchParams: { [key: string]:
       }),
       prisma.result.count({ where: query }),
     ]);
-
-    console.log("Results count:", count);
-
     const data = dataRes.map((item) => ({ ...item }));
-
-    // Fetch branches and semesters for filters
     const branches = await prisma.branch.findMany().catch(() => []);
     const semesters = await prisma.semester.findMany().catch(() => []);
-
-    // Fetch subjects for filters (only allotted subjects for teachers)
     const subjects =
       role === "teacher"
         ? await prisma.subject
@@ -152,7 +127,17 @@ const ResultListPage = async ({ searchParams }: { searchParams: { [key: string]:
     return (
       <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
         <div className="flex items-center justify-between">
-          <StudentResultDownload role={role} />
+        <Link href="/list/results/failed">
+  <div className="flex items-center gap-2">
+    {/* Replace with your actual SVG code */}
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
+    </svg>
+    <h1 className="text-xl font-semibold mb-8 mr-20 p-4 border rounded bg-yellow-200">
+      Check the Failed Students
+    </h1>
+  </div>
+</Link>
           <h1 className="hidden md:block text-lg font-semibold">All Results</h1>
         </div>
         <TableSearch />
@@ -179,4 +164,4 @@ const ResultListPage = async ({ searchParams }: { searchParams: { [key: string]:
   }
 };
 
-export default ResultListPage;
+export default AllResultListPage;

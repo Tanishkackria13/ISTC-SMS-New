@@ -86,6 +86,12 @@ const TeacherListPage = async ({
           {(role === "registrar" || role === "admin" || role === "theoryIncharge") && (
             <>
               <FormContainer table="teacher" type="update" data={item} />
+              
+            </>
+          )}
+          {( role === "admin" || role === "theoryIncharge") && (
+            <>
+              
               <FormContainer table="teacher" type="delete" id={item.id} />
             </>
           )}
@@ -181,9 +187,10 @@ const TeacherListPage = async ({
               // semester={searchParams.semester}
             />
 
-            {(role === "admin" || role === "registrar" || role === "theoryIncharge") && (
+            {(role === "admin" || role === "theoryIncharge") && (
               <FormContainer table="teacher" type="create" />
             )}
+            
           </div>
         </div>
       </div>

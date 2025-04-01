@@ -351,7 +351,7 @@ export const deleteTeacher = async (
 ) => {
   const id = data.get("id") as string;
   try {
-    await clerkClient.users.deleteUser(id);
+    // await clerkClient.users.deleteUser(id);
 
     await prisma.teacher.delete({
       where: {
@@ -458,12 +458,12 @@ export const createTheoryIncharge = async (
   data: TheoryInchargeSchema
 ) => {
   try {
-    const user = await clerkClient.users.createUser({
-      username: data.username,
-      password: data.password || "",
-      // name: data.name,
-      publicMetadata: { role: "theoryIncharge" },
-    });
+    // const user = await clerkClient.users.createUser({
+    //   username: data.username,
+    //   password: data.password || "",
+    //   // name: data.name,
+    //   publicMetadata: { role: "theoryIncharge" },
+    // });
 
     await prisma.theoryIncharge.create({
       data: {
@@ -491,11 +491,11 @@ export const updateTheoryIncharge = async (
     return { success: false, error: true };
   }
   try {
-    const user = await clerkClient.users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      name: data.name,
-    });
+    // const user = await clerkClient.users.updateUser(data.id, {
+    //   username: data.username,
+    //   ...(data.password !== "" && { password: data.password }),
+    //   name: data.name,
+    // });
 
     await prisma.theoryIncharge.update({
       where: {
