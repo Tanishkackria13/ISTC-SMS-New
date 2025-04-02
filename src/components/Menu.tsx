@@ -28,18 +28,12 @@ const menuItems = [
         icon: "/teacher.png",
         label: "Theory Incharges",
         href: "/list/theoryIncharges",
-        visible: ["registrar"],
+        visible: ["admin"],
       },
       {
         icon: "/registrar.png",
         label: "Registrars",
         href: "/list/registrars",
-        visible: ["admin"],
-      },
-      {
-        icon: "/registrar.png",
-        label: "Teacher Incharges",
-        href: "/list/theoryIncharges",
         visible: ["admin"],
       },
       {
