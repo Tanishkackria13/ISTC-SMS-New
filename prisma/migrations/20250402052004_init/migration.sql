@@ -21,6 +21,7 @@ CREATE TABLE `Student` (
     `phone` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NULL,
     `sex` ENUM('MALE', 'FEMALE', 'PREFER_NOT_TO_SAY') NULL,
+    `category` VARCHAR(191) NULL,
     `bloodType` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `branchId` INTEGER NOT NULL,

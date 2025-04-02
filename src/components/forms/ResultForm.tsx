@@ -114,8 +114,6 @@ const ResultForm = ({
       <h1 className="text-xl font-semibold">
         {type === "create" ? "Create a result" : "Update the result"}
       </h1>
-
-      {/* Toggle for Sessional Exam */}
       <div className="flex items-center gap-2">
         <input
           type="checkbox"

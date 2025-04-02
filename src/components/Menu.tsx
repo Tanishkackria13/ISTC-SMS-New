@@ -13,16 +13,22 @@ const menuItems = [
         visible: ["admin", "teacher", "registrar", "theoryIncharge"],
       },
       {
+        icon: "/student.png",
+        label: "Students",
+        href: "/list/students",
+        visible: ["admin", "teacher", "registrar","theoryIncharge"],
+      },
+      {
         icon: "/teacher.png",
         label: "Teachers",
         href: "/list/teachers",
         visible: ["admin", "registrar","theoryIncharge"],
       },
       {
-        icon: "/student.png",
-        label: "Students",
-        href: "/list/students",
-        visible: ["admin", "teacher", "registrar","theoryIncharge"],
+        icon: "/teacher.png",
+        label: "Theory Incharges",
+        href: "/list/theoryIncharges",
+        visible: ["registrar"],
       },
       {
         icon: "/registrar.png",
