@@ -560,11 +560,10 @@ export const createStudent = async (
     //   name: data.name,
     //   fatherName: data.fatherName,
     //   motherName: data.motherName,
-
     //   publicMetadata:{role:"student"}
     // });
 
-    await prisma.student.create({
+    const newStudent = await prisma.student.create({
       data: {
         // id: user.id,
         username: data.username,
@@ -583,6 +582,9 @@ export const createStudent = async (
       },
     });
 
+    // Calculate grace marks for the new student
+    await calculateGraceMarks(newStudent.id, data.semesterId);
+
     // revalidatePath("/list/students");
     return { success: true, error: false };
   } catch (err) {
@@ -590,6 +592,23 @@ export const createStudent = async (
     return { success: false, error: true };
   }
 };
+
+
+export const calculateGraceMarks = async (studentId: string, semesterId: number) => {
+  const subjects = await prisma.subject.findMany({
+    where: { semesterId },
+  });
+
+  const totalMarks = subjects.reduce((sum, sub) => sum + (sub.maxMarks || 0), 0);
+  const graceMarks = Math.floor(totalMarks * 0.01);
+
+  await prisma.graceMarks.upsert({
+    where: { studentId_semesterId: { studentId, semesterId } },
+    update: { totalGrace: graceMarks },
+    create: { studentId, semesterId, totalGrace: graceMarks, usedGrace: 0 },
+  });
+};
+
 
 export const updateStudent = async (
   currentState: CurrentState,
@@ -1163,4 +1182,79 @@ export const deleteResult = async (
     console.log(err);
     return { success: false, error: true };
   }
+};
+
+export const processFailedResult = async (studentId: string, subjectId: number, marks: number) => {
+  const reappearRecord = await prisma.reappear.findFirst({
+    where: { studentId, subjectId, status: "Pending" },
+  });
+
+  if (!reappearRecord) return;
+
+  const semesterId = reappearRecord.semesterId;
+  const graceRecord = await prisma.graceMarks.findUnique({
+    where: { studentId_semesterId: { studentId, semesterId } },
+  });
+
+  let graceLeft = (graceRecord?.totalGrace || 0) - (graceRecord?.usedGrace || 0);
+  const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
+
+  if (!subject) return;
+
+  const passingMark = Math.ceil(subject.maxMarks! * 0.4);
+  const graceEligibleMark = Math.ceil(subject.maxMarks! * 0.35);
+
+  let finalMarks = marks;
+  let finalStatus = "Failed";
+  let usedGrace = 0;
+
+  if (marks >= passingMark) {
+    finalStatus = "Passed";
+  } else if (marks >= graceEligibleMark && graceLeft > 0) {
+    let neededGrace = passingMark - marks;
+    usedGrace = Math.min(neededGrace, graceLeft);
+    finalMarks += usedGrace;
+    graceLeft -= usedGrace;
+    finalStatus = "Passed";
+  }
+
+  // Update reappear status
+  await prisma.reappear.update({
+    where: { id: reappearRecord.id },
+    data: { status: finalStatus },
+  });
+
+  // If passed, update the result in the `Result` table
+  if (finalStatus === "Passed") {
+    const newGrade = calculateGrade(finalMarks, subject.maxMarks!);
+
+    await prisma.result.updateMany({
+      where: { studentId, subjectId },
+      data: {
+        overallMark: finalMarks,
+        grade: newGrade,
+      },
+    });
+
+    // Update used grace marks if grace was used
+    if (usedGrace > 0) {
+      await prisma.graceMarks.update({
+        where: { studentId_semesterId: { studentId, semesterId } },
+        data: { usedGrace: graceRecord?.usedGrace! + usedGrace },
+      });
+    }
+  }
+};
+
+// Helper function to calculate grade
+export const calculateGrade = (marks: number, maxMarks: number): string => {
+  const percentage = (marks / maxMarks) * 100;
+
+  if (percentage >= 90) return "A+";
+  if (percentage >= 80) return "A";
+  if (percentage >= 70) return "B";
+  if (percentage >= 60) return "C";
+  if (percentage >= 50) return "D";
+  if (percentage >= 40) return "E";
+  return "F"; // Failing grade
 };
