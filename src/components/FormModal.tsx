@@ -41,7 +41,7 @@ const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
 const RegistrarForm = dynamic(() => import("./forms/RegistrarForm"), {
   loading: () => <h1>Loading...</h1>,
 });
-const TheoryInchargeForm = dynamic(() => import("./forms/TheoryInchargeForm"), {
+const TheoryInchargeForm = dynamic(() => import("@/components/forms/TheoryInchargeForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 const StudentForm = dynamic(() => import("./forms/StudentForm"), {
