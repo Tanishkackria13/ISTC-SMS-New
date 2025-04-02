@@ -186,6 +186,7 @@ model Result {
   teacherId String?
   teacher   Teacher? @relation(fields: [teacherId], references: [id], map: "Result_teacherId_fk")
 
+  usedGrace Boolean @default(false)
   verified Boolean @default(false)
 }
 
@@ -217,6 +218,40 @@ model AnnouncementTeacher {
   teacher        Teacher      @relation(fields: [teacherId], references: [id])
 
   @@id([announcementId, teacherId])
+}
+
+model GraceMarks {
+  id         Int      @id @default(autoincrement())
+  studentId  String   @unique
+  semesterId Int
+  totalGrace Int
+  usedGrace  Int      @default(0)
+
+  student    Student  @relation(fields: [studentId], references: [id])
+  semester   Semester @relation(fields: [semesterId], references: [id])
+}
+
+model Reappear {
+  id         Int      @id @default(autoincrement())
+  studentId  String
+  subjectId  Int
+  semesterId Int
+  isFeePaid  Boolean  @default(false)
+
+  student    Student  @relation(fields: [studentId], references: [id])
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+  semester   Semester @relation(fields: [semesterId], references: [id])
+}
+
+model Failed {
+  id         Int      @id @default(autoincrement())
+  studentId  String
+  subjectId  Int
+  semesterId Int
+
+  student    Student  @relation(fields: [studentId], references: [id])
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+  semester   Semester @relation(fields: [semesterId], references: [id])
 }
 
 enum AnnouncementType {
